@@ -1,0 +1,3 @@
+rootProject.name = 'opentracing-kotlin'
+include 'opentracing-kotlin-core'
+include 'opentracing-kotlin-springboot-support'
