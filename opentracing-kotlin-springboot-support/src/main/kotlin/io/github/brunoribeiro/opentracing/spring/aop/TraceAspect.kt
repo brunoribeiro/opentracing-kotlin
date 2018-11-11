@@ -1,4 +1,4 @@
-package io.github.brunoribeiro.opentracing.spring.config
+package io.github.brunoribeiro.opentracing.spring.aop
 
 import io.github.brunoribeiro.opentracing.core.OpenTracing.trace
 import org.aspectj.lang.ProceedingJoinPoint

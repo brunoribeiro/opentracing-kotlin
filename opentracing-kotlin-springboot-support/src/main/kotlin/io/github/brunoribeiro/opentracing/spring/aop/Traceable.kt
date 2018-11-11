@@ -1,4 +1,4 @@
-package io.github.brunoribeiro.opentracing.spring.config
+package io.github.brunoribeiro.opentracing.spring.aop
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

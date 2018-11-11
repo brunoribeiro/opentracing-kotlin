@@ -5,6 +5,7 @@ import com.lightstep.tracer.shared.Options
 import io.opentracing.Span
 import io.opentracing.SpanContext
 import io.opentracing.Tracer
+import io.opentracing.noop.NoopTracerFactory
 import io.opentracing.propagation.Format
 import io.opentracing.propagation.TextMapExtractAdapter
 import io.opentracing.util.GlobalTracer
@@ -19,7 +20,9 @@ object OpenTracing {
 
     private lateinit var headersResolver: () -> Map<String, String>
 
-    private fun spanContext(): SpanContext? = tracer?.extract(Format.Builtin.HTTP_HEADERS, TextMapExtractAdapter(headersResolver.invoke()))
+    private fun spanContext(): SpanContext? = tracer()?.extract(Format.Builtin.HTTP_HEADERS, TextMapExtractAdapter(headersResolver.invoke()))
+
+    fun tracer() = tracer
 
     fun configure(configuration: OpenTracingConfiguration,
                   headersResolver: () -> Map<String, String> = { emptyMap() }) {
@@ -43,23 +46,23 @@ object OpenTracing {
             OpenTracing.headersResolver = headersResolver
 
         } catch (e: RuntimeException) {
-            logger.warn(e.message, e)
-            throw TracerNotConfiguredException()
+            logger.error("Could not configure tracing, using noop.", e)
+            tracer = NoopTracerFactory.create()
         }
     }
 
 
-    fun span(): Span? = tracer?.activeSpan() ?: throw TracerNotConfiguredException()
+    fun span(): Span? = tracer()?.activeSpan() ?: throw TracerNotConfiguredException()
 
 
     fun <T> trace(operationName: String, block: () -> T?): T {
 
-        assert(tracer != null) { throw TracerNotConfiguredException() }
+        assert(tracer() != null) { throw TracerNotConfiguredException() }
 
         val spanContext = spanContext()
 
-        val scope = spanContext?.let { tracer?.buildSpan(operationName)?.asChildOf(it) }
-                ?: tracer?.buildSpan(operationName)
+        val scope = spanContext?.let { tracer()?.buildSpan(operationName)?.asChildOf(it) }
+                ?: tracer()?.buildSpan(operationName)
 
         return scope?.startActive(true).use {
             block.invoke()!!
