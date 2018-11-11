@@ -42,6 +42,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     compile "io.github.brunoribeiro:opentracing-kotlin-core:${opentracingKotlinCoreVersion}"
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter")
 
 

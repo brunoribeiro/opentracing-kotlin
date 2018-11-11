@@ -13,13 +13,14 @@ class OpenTracingSpringConfiguration {
 
     @PostConstruct
     fun setupTracer(config: OpenTracingPropertiesConfiguration) =
-        OpenTracing.configure(config.asOpenTracingConfiguration()) { httpHeaders() }
+            OpenTracing.configure(config.asOpenTracingConfiguration()) { httpHeaders() }
 
 
     private fun httpHeaders(): Map<String, String> {
         val requestAttributes = RequestContextHolder.getRequestAttributes()
         val servletRequest = requestAttributes?.let { (it as ServletRequestAttributes).request }
-        return servletRequest?.let {  request -> request.headerNames.asSequence().map { it to request.getHeader(it)  }.toMap() } ?: emptyMap()
+        return servletRequest?.let { request -> request.headerNames.asSequence().map { it to request.getHeader(it) }.toMap() }
+                ?: emptyMap()
     }
 }
 
