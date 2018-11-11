@@ -1,6 +1,5 @@
-# Project Title
 
-OpenTracing Kotlin
+# OpenTracing Kotlin
 
 ## Why
 
