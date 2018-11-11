@@ -1,0 +1,94 @@
+buildscript {
+    ext.kotlinVersion = '1.3.0'
+    ext.springBootVersion = '1.5.3.RELEASE'
+
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'com.jfrog.bintray.gradle', name: 'gradle-bintray-plugin', version: '1.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+
+    }
+}
+
+group 'io.github.brunoribeiro'
+version '0.0.1'
+
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "maven-publish"
+apply plugin: 'com.jfrog.bintray'
+
+
+bootRepackage.enabled = false
+
+ext {
+    opentracingKotlinCoreVersion = "0.0.1"
+}
+repositories {
+    mavenCentral()
+
+    maven {
+        url  "https://dl.bintray.com/ribeiropt/maven"
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    compile "io.github.brunoribeiro:opentracing-kotlin-core:${opentracingKotlinCoreVersion}"
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-aop")
+    compile("org.springframework.boot:spring-boot-starter")
+
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'maven'
+        name = 'opentracing-kotlin-springboot-support'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/brunoribeiro/opentracing-kotlin.git'
+    }
+}
+
+publishing {
+    publications {
+
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId 'io.github.brunoribeiro'
+            artifactId 'opentracing-kotlin-springboot-support'
+            version '0.0.1'
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}

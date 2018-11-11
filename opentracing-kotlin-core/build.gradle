@@ -1,0 +1,82 @@
+buildscript {
+    ext.kotlinVersion = '1.3.0'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'com.jfrog.bintray.gradle', name: 'gradle-bintray-plugin', version: '1.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}"
+        classpath "org.jetbrains.kotlin:kotlin-noarg:${kotlinVersion}"
+    }
+}
+
+group 'io.github.brunoribeiro'
+version '0.0.1'
+
+apply plugin: 'kotlin'
+apply plugin: "maven-publish"
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url  "https://dl.bintray.com/ribeiropt/maven"
+    }
+}
+
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    compile("com.lightstep.tracer:lightstep-tracer-jre:0.14.2")
+    compile("com.lightstep.tracer:tracer-okhttp:0.15.2")
+    compile("io.opentracing:opentracing-api:0.31.0")
+    compile("io.opentracing.contrib:opentracing-jaxrs2:0.1.6")
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+}
+
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['mavenJava']
+
+    pkg {
+        repo = 'maven'
+        name = 'opentracing-kotlin-core'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/brunoribeiro/opentracing-kotlin.git'
+    }
+}
+
+publishing {
+    publications {
+
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId 'io.github.brunoribeiro'
+            artifactId 'opentracing-kotlin-core'
+            version '0.0.1'
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
