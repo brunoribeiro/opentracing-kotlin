@@ -59,7 +59,7 @@ object OpenTracing {
 
         assert(tracer() != null) { throw TracerNotConfiguredException() }
 
-        val spanContext = spanContext()
+        val spanContext = span()?.context()?: spanContext()
 
         val scope = spanContext?.let { tracer()?.buildSpan(operationName)?.asChildOf(it) }
                 ?: tracer()?.buildSpan(operationName)
